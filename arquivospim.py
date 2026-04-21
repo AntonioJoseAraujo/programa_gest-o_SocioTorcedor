@@ -103,8 +103,6 @@ def acessar_cadastro():
         escolha = definir_ingresso()
         calcular_valor_final(escolha=escolha)
         # usar a definição que ela escolher para aplicar o desconto
-        
-            
 
 def salvar_clientes(clientes):
     with open(ARQUIVO, "w", encoding="utf-8") as f:

@@ -1,0 +1,9 @@
+1 | Tony | 25 | Diamente
+2 | Vitim | 24 | Bronze
+3 | Wesley | 19 | Ouro
+4 | Julia | 20 | Diamante
+7 | Kaka | 19 | Ouro
+8 | Jacare | 30 | Ouro
+9 | Tiko | 26 | Diamente
+10 | Loko | 20 | Prata
+11 | You | 30 | Bronze

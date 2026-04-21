@@ -8,6 +8,65 @@ from time import sleep
 ARQUIVO = "socio_torcedor.txt"
 SEPARADOR = " | "
 
+# --- Main() -----------------------------------------------------
+
+def main():
+    """
+    -> Função principal
+    """
+
+    while True:
+        menu()
+        opcao = input("Opção: ")
+
+        if opcao == "1":
+            mostrar_planos()
+        
+        elif opcao == "2":
+            print()
+            print('---------- Novo Cadastro ----------')
+            nome = input("Nome: ").capitalize().strip()
+            idade = obter_idade()
+            if idade < 18:
+                print("Assinaturas indisponiveis para sua idade!")
+                sleep(3)
+                break
+
+            plano_opção = input("Escolha o nº do plano: ").upper().strip()
+
+            planos = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamante"}
+
+            if plano_opção in planos:
+                plano = planos[plano_opção]
+                pagamentos()
+                clientes = carregar_clientes()
+                novo_id = proximo_id(clientes)
+                clientes[novo_id] = {
+                    "id":    novo_id,
+                    "nome":  nome,
+                    "idade": str(idade),
+                    "plano": plano,
+                }
+                salvar_clientes(clientes)
+                
+                print(f"Parabéns {nome} por adquirir o plano {plano}!!!")
+                print(f"Seu ID de sócio é : {novo_id} ")
+            else:
+                print("Escolha incorreta!")
+
+        elif opcao == "3":
+            acessar_cadastro()
+            
+        elif opcao == "0":
+            print('Encerrando Sistema...')
+            sleep(3)
+            break
+        elif opcao != "0" and opcao != "1" and opcao != "2" and opcao != "3":
+                print("Opção incorreta!")
+                sleep(2)
+                limpar_tela()
+                continue
+            
 # --- Banco de dados ---------------------------------------------
 
 def novo_cadastro():
@@ -101,8 +160,23 @@ def acessar_cadastro():
     elif acao == "3":
         mostrar_ingressos()
         escolha = definir_ingresso()
-        calcular_valor_final(escolha=escolha)
-        # usar a definição que ela escolher para aplicar o desconto
+        print()
+
+        if escolha is not None and escolha > 0:
+            valor = calcular_valor_final(escolha=escolha)
+            if clientes[buscar_id]["plano"] == "Bronze":
+                print("Seu plano não oferece % de desconto")
+            
+            elif clientes[buscar_id]["plano"] == "Prata":
+                print(f"Valor à ser pago: R${valor - (valor - valor * 20/100):.2f}")
+
+            elif clientes[buscar_id]["plano"] == "Ouro":
+                print(f"Valor à ser pago: R${valor - (valor - valor * 30/100):.2f}")
+
+            elif clientes[buscar_id]["plano"] == "Diamante":
+                print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
+        
+       
 
 def salvar_clientes(clientes):
     with open(ARQUIVO, "w", encoding="utf-8") as f:
@@ -134,63 +208,7 @@ def carregar_clientes():
     return clientes
 
 # --- Menu Principal ----------------------------------------------
-def main():
-    """
-    -> Função principal
-    """
 
-    while True:
-        menu()
-        opcao = input("Opção: ")
-
-        if opcao == "1":
-            mostrar_planos()
-        
-        elif opcao == "2":
-            print()
-            print('---------- Novo Cadastro ----------')
-            nome = input("Nome: ").capitalize().strip()
-            idade = obter_idade()
-            if idade < 18:
-                print("Assinaturas indisponiveis para sua idade!")
-                sleep(3)
-                break
-
-            plano_opção = input("Escolha o nº do plano: ").upper().strip()
-
-            planos = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamente"}
-
-            if plano_opção in planos:
-                plano = planos[plano_opção]
-                pagamentos()
-                clientes = carregar_clientes()
-                novo_id = proximo_id(clientes)
-                clientes[novo_id] = {
-                    "id":    novo_id,
-                    "nome":  nome,
-                    "idade": str(idade),
-                    "plano": plano,
-                }
-                salvar_clientes(clientes)
-                
-                print(f"Parabéns {nome} por adquirir o plano {plano}!!!")
-                print(f"Seu ID de sócio é : {novo_id} ")
-            else:
-                print("Escolha incorreta!")
-
-        elif opcao == "3":
-            acessar_cadastro()
-            
-        elif opcao == "0":
-            print('Encerrando Sistema...')
-            sleep(3)
-            break
-        elif opcao != "0" and opcao != "1" and opcao != "2" and opcao != "3":
-                print("Opção incorreta!")
-                sleep(2)
-                limpar_tela()
-                continue
-            
 def menu():
     """
     -> Função responsável por apresentar o menu principal
@@ -281,22 +299,19 @@ def obter_idade():
 
 def definir_ingresso():
     while True:
-        escolha = input("Opção: ")
-
         try:
-            escolha = int(escolha)
+            op_ingresso = int(input("Opção: "))
 
-            if escolha < 1 and escolha > 11:
-                print("Escolha um ingresso válido!")
+            if op_ingresso < 0 or op_ingresso > 11:
+                print("Escolha uma opção válida!")
                 continue
 
-            elif escolha == 0:
+            elif op_ingresso == 0:
                 limpar_tela()
                 return
-            
-            else:
-                return escolha
-        
+                
+            return op_ingresso
+
         except ValueError:
             print("Digite o número correspondente ao ingresso!")
 
@@ -313,7 +328,12 @@ def calcular_valor_final(escolha):
              ("[10] - OESTE INFERIOR CENTRAL", 250.00),
              ("[11] - OESTE INFERIOR LATERAL", 290.00),]
     
-    print(ingressos[escolha - 1][1])
+    if escolha == 0:
+        return
+    else:
+        ingresso = ingressos[escolha - 1][1]
+        print(f"Valor total do ingresso R${ingresso:.2f}")
+        return ingresso
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -376,4 +396,3 @@ def gera_boleto():
 def pausar():
     input("\nPressione Enter para continuar...")
     limpar_tela()
-

@@ -12,7 +12,19 @@ SEPARADOR = " | "
 
 def main():
     """
-    -> Função principal
+    -> Função principal responsavel por rodar as demais funções do código a
+    partir do primeiro input recebido após a apresentação do menu principal.
+    Variavel opcao: recebe o primeiro input do programa o qual deve ser um número
+
+    if opcao == "1": caso o valor do input seja "1" os planos são apresentados na
+    tela do usuario a partir da função mostrar_planos()
+
+    elif opcao == "2": caso o valor do input seja "2" uma tela de cadastro é 
+    apresentada. Esta tela pede o nome a partir de um input direto na função
+    e a idade a partir da função obter_idade definida na váriavel idade
+        Dentro desta estrutura condicional temos: 
+        if idade <18: ela impossibilita o cadastro do futuro sócio torcedor caso
+        o mesmo tenha menos de 18 anos 
     """
 
     while True:
@@ -26,11 +38,12 @@ def main():
             print()
             print('---------- Novo Cadastro ----------')
             nome = input("Nome: ").capitalize().strip()
+            sobrenome = input("Sobrenome: ").capitalize().strip()
             idade = obter_idade()
             if idade < 18:
                 print("Assinaturas indisponiveis para sua idade!")
                 sleep(3)
-                break
+                main()
 
             plano_opção = input("Escolha o nº do plano: ").upper().strip()
 
@@ -44,36 +57,54 @@ def main():
                 clientes[novo_id] = {
                     "id":    novo_id,
                     "nome":  nome,
+                    "sobrenome" : sobrenome,
                     "idade": str(idade),
                     "plano": plano,
                 }
                 salvar_clientes(clientes)
                 
-                print(f"Parabéns {nome} por adquirir o plano {plano}!!!")
+                print(f"Parabéns {nome} {sobrenome} por adquirir o plano {plano}!!!")
                 print(f"Seu ID de sócio é : {novo_id} ")
+                sleep(7)
+                limpar_tela()
             else:
                 print("Escolha incorreta!")
 
         elif opcao == "3":
             acessar_cadastro()
+
+        elif opcao == "4":
+            recuperar_id()
             
         elif opcao == "0":
             print('Encerrando Sistema...')
             sleep(3)
             break
-        elif opcao != "0" and opcao != "1" and opcao != "2" and opcao != "3":
-                print("Opção incorreta!")
-                sleep(2)
-                limpar_tela()
-                continue
+        elif opcao != "0" and opcao != "1" and opcao != "2" and opcao != "3" and opcao!= "4":
+            print("Opção incorreta!")
+            sleep(2)
+            limpar_tela()
+            continue
             
 # --- Banco de dados ---------------------------------------------
 
 def novo_cadastro():
+    """
+    => Função responsável por realizar o cadastro de novos sócios
+    1 - Ela inicia com a declação da função carregar_clientes() a qual é encarregada 
+    de gerar/carregar o arquivo txt e seu conteúdo.
+    2 - Variavel nome: é um input direto do nome da pessoa o qual já é tratado para
+    que as primeiras letras fiquem maiúsculas e espaços vazios sejam eliminados
+    3 - Variável idade: ela recebe a idade através da declação da função obter_idade.
+    4 - if < 18: verifica o retorno da variável idade, caso a pessoa tenha menos 
+    que 18 anos de idade a possibilidade de cadastro é bloqueada
+    5 - if id_ in clientes
+    """
     clientes = carregar_clientes()
 
     print()
-    nome  = input("Nome: ").capitalize().strip()
+    nome  = input("Digite o nome: ").capitalize().strip()
+    sobrenome = input("Digite o sobrenome: ").capitalize().strip()
     idade = obter_idade()
 
     if idade < 18:
@@ -93,14 +124,16 @@ def novo_cadastro():
     novo = {
         "id":    id_,
         "nome":  nome,
+        "sobrenome" : sobrenome,
         "idade": str(idade),
         "plano": plano,
     }
     clientes[id_] = novo
     salvar_clientes(clientes)
 
-    print(f"\nParabéns, {nome}! Cadastro no plano {plano} realizado com sucesso!")
+    print(f"\nParabéns, {nome} {sobrenome}! Cadastro no plano {plano} realizado com sucesso!")
     print(f"Seu número de sócio é: {novo['id']}")
+
 
 def obter_id():
     while True:
@@ -133,6 +166,7 @@ def acessar_cadastro():
     print("_" * 40)
     print(f"Nº de sócio : {consulta['id']}")
     print(f"Nome        : {consulta['nome']}")
+    print(f"Sobrenome   : {consulta['sobrenome']}")
     print(f"Idade       : {consulta['idade']} anos")
     print(f"Plano       : {consulta['plano']}")
     print("_" * 40)
@@ -159,7 +193,7 @@ def acessar_cadastro():
 
     elif acao == "3":
         mostrar_ingressos()
-        escolha = definir_ingresso()
+        escolha = definir_ingresso() #pode ser None caso o usuário escolha voltar para o menu principal
         print()
 
         if escolha is not None and escolha > 0:
@@ -181,7 +215,7 @@ def acessar_cadastro():
 def salvar_clientes(clientes):
     with open(ARQUIVO, "w", encoding="utf-8") as f:
         for c in clientes.values():
-            linha = SEPARADOR.join([c["id"], c["nome"], c["idade"], c["plano"]])
+            linha = SEPARADOR.join([c["id"], c["nome"], c["sobrenome"], c["idade"], c["plano"]])
             f.write(linha + "\n")
 
 def proximo_id(clientes):
@@ -196,10 +230,11 @@ def carregar_clientes():
             for linha in f:
                 linha = linha.strip()
                 if linha:
-                    id_, nome, idade, plano = linha.split(SEPARADOR)
+                    id_,nome,sobrenome,idade,plano = linha.split(SEPARADOR)
                     clientes[id_] = {
                         "id":    id_,
                         "nome":  nome,
+                        "sobrenome" : sobrenome,
                         "idade": idade,
                         "plano": plano,
                     }
@@ -215,11 +250,12 @@ def menu():
     """
     print("_" * 40)
     print("PROGRAMA SÓCIO TORCEDOR".center(40))
-    print("IBIS F.C".center(40))
+    print("IBIS SPORT CLUB".center(40))
     print("_" * 40)
     print("[1] - Mostrar planos disponiveis")
     print("[2] - Novo cadastro")
     print("[3] - Acessar seu cadastro")
+    print("[4] - Esqueci meu ID")
     print("[0] - Sair")
 
 def mostrar_planos():
@@ -261,6 +297,11 @@ def mostrar_planos():
     sleep(2)
 
 def mostrar_ingressos():
+    """
+    => Função responsável para mostrar as opções de ingressos que podem ser
+    adiquiros pelo torcedor.
+    Não retorna nada, apenas apresenta as informações na tela
+    """
     ingressos = [("[1] - NORTE", 80.00),
              ("[2] - SUL", 130.00),
              ("[3] - LESTE SUPERIOR CORNER",115.00),
@@ -280,13 +321,13 @@ def mostrar_ingressos():
     for ingresso, valor in ingressos:
         valor = f"{valor:.2f}"
         print(f"{ingresso:.<32}R${valor:>0}")
-    print("[0] - CANCELAR")
+    print("[0] - MENU PRINCIPAL")
 
 
 def obter_idade():
     """
     -> Função responsável por receber a idade como uma str, transforma-la em int
-    e retorna-lá para que possa ser usada em main()
+    e retorna-lá para que possa ser usada em novo_cadastro()
     """
     while True:
         idade = input("Idade: ")
@@ -338,6 +379,23 @@ def calcular_valor_final(escolha):
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def recuperar_id():
+    clientes = carregar_clientes()
+    print()
+    print("---------- Recuperar ID de sócio ----------")
+    buscar_nome = input("Digite seu nome: ").strip().capitalize()
+    buscar_sobrenome = input("Digite seu sobrenome: ").strip().capitalize()
+    print()
+    
+    for cliente in clientes.values():
+        if cliente['nome'] == buscar_nome and cliente['sobrenome'] == buscar_sobrenome:
+            cliente_encontrado = cliente
+            print(f'Seu ID de sócio é: #{cliente_encontrado['id']}')
+            break
+    else:       
+        print("Cadastro não encontrado!")
+
+
 # --- Formas de pagamento -----------------------------------------
 
 def pagamentos():    
@@ -388,11 +446,7 @@ def chave_pix():
     print('')
 
 def gera_boleto():
-    for i in range (30):
+    for _ in range (30): #_ usado no lugar de i para indicar que a variável não será utilizada
         print(random.randint(1,99), end='')
     print('')
     sleep(5)
-
-def pausar():
-    input("\nPressione Enter para continuar...")
-    limpar_tela()

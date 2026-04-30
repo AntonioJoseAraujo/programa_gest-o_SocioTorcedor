@@ -1,10 +1,4 @@
-1 | Mariana | Bernardes | 39 | Bronze
-2 | Tony | Araujo | 37 | Diamante
-3 | Zezim | Juko | 20 | Prata
-4 | Ju | Melo | 20 | Diamante
-5 | Luizim | Patim | 26 | Prata
-6 | Zika | Virus | 19 | Ouro
-7 | Du | Lamb | 35 | Bronze
-8 | Ares | Alfa | 37 | Diamante
-9 | Lu | Leao | 19 | Ouro
-10 | Marli | Capi | 47 | Bronze
+1 | Tony | Araujo | 37 | 123456 | Diamante
+2 | Wesley | Zerotreze | 22 | 3210 | Prata
+3 | Ju | Loka | 21 | 0101 | Diamante
+4 | Vitim | Lolo | 24 | 1234 | Bronze

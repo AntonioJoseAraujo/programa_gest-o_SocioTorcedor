@@ -18,10 +18,19 @@ def obter_idade():
 
 
 def limpar_tela():
+    """
+    Limpa a tela do terminal
+    Usada para melhorar a estética do programa
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def recuperar_id():
+    """
+    Caso o usuário esqueça o seu id de cadastro. 
+    Ele pode consultar pressionando a tecla 4 no menu principal a qual vai 
+    executar a função em questão permitindo a recumento através do nome e sobrenome
+    """
     clientes = cadastrar.carregar_clientes()
     print()
     print("---------- Recuperar ID de sócio ----------")

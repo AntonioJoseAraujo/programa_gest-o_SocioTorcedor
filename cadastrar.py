@@ -1,15 +1,22 @@
+"""Módulo responsável pelo cadastro de sócios."""
+
 import menu_inicial
 import arquivospim
 import planos
 import formas_pagamentos
 from time import sleep
+import pwinput
 
 ARQUIVO = "socio_torcedor.txt"
 SEPARADOR = " | "
 
+# ------- Senhas -------
+
 
 def obter_senha():
-    """Solicita e confirma a senha do usuário durante o cadastro"""
+    """
+    Solicita e confirma a senha do usuário durante o cadastro
+    """
     while True:
         senha = input("Crie uma senha: ").strip()
         if len(senha) < 4:
@@ -22,7 +29,9 @@ def obter_senha():
 
 
 def recuperar_senha():
-    """Recupera a senha usando ID + Nome + Sobrenome."""
+    """
+    Recupera a senha usando ID + Nome + Sobrenome.
+    """
     print("---------- Recuperar Senha ----------")
     id_ = input("Digite seu ID de sócio: ").strip()
     nome = input("Digite seu nome: ").capitalize().strip()
@@ -40,45 +49,118 @@ def recuperar_senha():
     else:
         print("Dados incorretos! Não foi possível recuperar a senha.")
 
-    input("\nPressione Enter para continuar...")
+    input("\nPressione ENTER para continuar...")
     arquivospim.limpar_tela()
 
 
+# --- Confirmações de informações
+
+
+def confirmar_informacoes(nome: str, sobrenome: str) -> bool:
+    """
+    Confirma nome e o sobrenome digitado
+    """
+    print("---------- Confirmação de Informações ----------")
+    print("\nConfirme suas informações:")
+    print(f"Nome: {nome} {sobrenome}")
+    print()
+
+    while True:
+        confirmacao = input("As informações estão corretas? (S/N): ").upper().strip()
+        if confirmacao == "S":
+            return True
+        elif confirmacao == "N":
+            print("Vamos corrigir as informações.")
+            return False  # Quebra o fluxo
+        else:
+            print("Opção inválida! Digite 'S' para Sim ou 'N' para Não.")
+
+
+def alterar_informacoes() -> str:
+    """
+    Permite o usuário digitar novamente o nome e sobrenome caso tenha digitado
+    algo incorretamente
+    """
+    print("---------- Alterar Informações ----------")
+    nome = input("Digite o nome: ").capitalize().strip()
+    sobrenome = input("Digite o sobrenome: ").capitalize().strip()
+    return nome, sobrenome
+
+
+def escolher_continuar():
+    """
+    Dá a possbilidade ao usuário de voltar ao menu principal caso tenha apertado
+    a tecla 2 por engano ou continuar o cadastro caso esse seja seu objetivo
+    """
+    while True:
+        print("---------- Novo Cadastro ----------")
+        print("[1] - CONTINUAR")
+        print("[0] - MENU PRINCIPAL")
+        escolha = input("Opcão: ")
+
+        if escolha != "1" and escolha != "0":
+            print("Opção inválida!")
+            continue
+
+        elif escolha == "0":
+            arquivospim.limpar_tela()
+            menu_inicial.main()
+
+        else:
+            break
+
+
+# --------- Realizar cadastro -----------
 def cadastrar():
-    print("---------- Novo Cadastro ----------")
-    nome = input("Nome: ").capitalize().strip()
-    sobrenome = input("Sobrenome: ").capitalize().strip()
+    """
+    105 se nao for vazio inicia outro loop
+    confirmar informacoes retorna true ou false
+    while not confirmar_informacoes: se for false ele entra no loop e chama a função alterar_informacoes para corrigir os dados,
+    caso seja true ele quebra o loop e segue o fluxo normal do cadastro
+    é um WHILE TRUE invertido
+    """
+    while True:
+        escolher_continuar()
+        nome = input("Nome: ").title().strip()
+        sobrenome = input("Sobrenome: ").title().strip()
+
+        if nome == "" or sobrenome == "":
+            print("O NOME e/ou SOBRENOME não podem estar em branco!")
+            continue
+        if (
+            not nome.replace(" ", "").isalpha()
+            or not sobrenome.replace(" ", "").isalpha()
+        ):
+            print("Nome e sobrenome não podem conter números!")
+            continue
+
+        else:
+            while not confirmar_informacoes(nome, sobrenome):
+                nome, sobrenome = alterar_informacoes()
+            break
+
     idade = arquivospim.obter_idade()
-    if idade < 18:
+    if idade < 18 or idade > 120:
         print("Assinaturas indisponiveis para sua idade!")
         sleep(3)
         menu_inicial.main()
         return
-    elif idade > 120:
-        op_idd = (
-            input(f"Tem certezar que você possui essa idade? > {idade} anos < (S/N): ")
-            .upper()
-            .strip()
-        )
-        if op_idd == "N":
-            menu_inicial.main()
-            return
-        elif op_idd == "S":
-            pass
-        else:
-            print("Opção inválida! Voltando ao menu...")
-            sleep(2)
-            menu_inicial.main()
-            return
 
     senha = obter_senha()
 
-    plano_opção = input("Escolha o nº do plano: ").upper().strip()
+    planos.mostrar_planos()
+    plano_opcao = input("Escolha o nº do plano: ").upper().strip()
 
-    planos = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamante"}
+    planos_disponiveis = {
+        "1": "Bronze",
+        "2": "Prata",
+        "3": "Ouro",
+        "4": "Diamante",
+        "5": "Social",
+    }
 
-    if plano_opção in planos:
-        plano = planos[plano_opção]
+    if plano_opcao in planos_disponiveis:
+        plano = planos_disponiveis[plano_opcao]
         formas_pagamentos.pagamentos()
         clientes = carregar_clientes()
         novo_id = proximo_id(clientes)
@@ -93,65 +175,19 @@ def cadastrar():
         salvar_clientes(clientes)
 
         print(f"Parabéns {nome} {sobrenome} por adquirir o plano {plano}!!!")
-        print(f"Seu ID de sócio é : {novo_id} ")
-        input("\nDigite enter para continuar...")
+        print(f"=====> Seu ID de sócio é : {novo_id} <=====")
+        input("\nPressione ENTER para continuar...")
         arquivospim.limpar_tela()
     else:
         print("Escolha incorreta!")
 
 
-def novo_cadastro():
-    """
-    => Função responsável por realizar o cadastro de novos sócios
-    1 - Ela inicia com a declação da função carregar_clientes() a qual é encarregada
-    de gerar/carregar o arquivo txt e seu conteúdo.
-    2 - Variavel nome: é um input direto do nome da pessoa o qual já é tratado para
-    que as primeiras letras fiquem maiúsculas e espaços vazios sejam eliminados
-    3 - Variável idade: ela recebe a idade através da declação da função obter_idade.
-    4 - if < 18: verifica o retorno da variável idade, caso a pessoa tenha menos
-    que 18 anos de idade a possibilidade de cadastro é bloqueada
-    5 - if id_ in clientes
-    """
-    clientes = carregar_clientes()
-
-    print()
-    nome = input("Digite o nome: ").capitalize().strip()
-    sobrenome = input("Digite o sobrenome: ").capitalize().strip()
-    idade = arquivospim.obter_idade()
-
-    if idade < 18:
-        print("Assinaturas indisponíveis para menores de idade!")
-        return
-
-    id_ = obter_id()
-
-    if id_ in clientes:
-        print(f"\nID já cadastrado! Bem-vindo de volta, {clientes[id_]['nome']}.")
-        print(f"Seu plano atual é: {clientes[id_]['plano']}")
-        return
-
-    senha = obter_senha()
-    planos.mostrar_planos()
-    plano = obter_plano()
-
-    novo = {
-        "id": id_,
-        "nome": nome,
-        "sobrenome": sobrenome,
-        "idade": str(idade),
-        "senha": senha,
-        "plano": plano,
-    }
-    clientes[id_] = novo
-    salvar_clientes(clientes)
-
-    print(
-        f"\nParabéns, {nome} {sobrenome}! Cadastro no plano {plano} realizado com sucesso!"
-    )
-    print(f"===> Seu número de sócio é: {novo['id']} <===")
-
-
+# --------- Funções auxiliares ----------
 def obter_id():
+    """
+    Obtem e retorna o ID do usuário para que possa ser usada na função
+    novo_cadastro()
+    """
     while True:
         id_ = input("Digite seu ID de sócio: ").strip()
         if id_:
@@ -159,18 +195,27 @@ def obter_id():
         print("ID inválido! Por favor, digite o ID correto.")
 
 
-def obter_plano():
-    opc = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamante"}
+def obter_plano() -> str:
+    """
+    Usuario escolha o plano atráves da variavel plano
+    E a opção é retornada em formato de string
+    """
+    opc = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamante", "5": "Social"}
     while True:
-        plano = input("Escolha o nº do plano (1-4): ").strip()
+        plano = input("Escolha o nº do plano (1-5): ").strip()
         if plano in opc:
             return opc[plano]
         print(
-            "Opção inválida! Escolha entre 1(Bronze), 2(Prata), 3(Ouro) ou 4(Diamante)."
+            "Opção inválida! Escolha entre 1(Bronze), 2(Prata), 3(Ouro), 4(Diamante) ou 5(Social)."
         )
 
 
+# ------- Funções de cadastro ----------
 def acessar_cadastro():
+    """
+    Permite que o usuario acesse o cadastro para que possa acessar algumas opções
+    como simular uma venda, alterar o plano atual, realizar cancelamente e afins
+    """
     clientes = carregar_clientes()
 
     print()
@@ -180,7 +225,7 @@ def acessar_cadastro():
         print("Nenhum cadastro encontrado com esse ID.")
         return
 
-    senha_digitada = input("Digite sua senha: ").strip()
+    senha_digitada = pwinput.pwinput("Digite sua senha: ").strip()
     if senha_digitada != clientes[buscar_id]["senha"]:
         print("Senha incorreta!")
         input("\nEsqueceu sua senha? Use a opção 'Recuperar Senha' no menu.")
@@ -245,8 +290,14 @@ def acessar_cadastro():
             elif clientes[buscar_id]["plano"] == "Diamante":
                 print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
 
+            elif clientes[buscar_id]["plano"] == "Social":
+                print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
+
 
 def salvar_clientes(clientes):
+    """
+    Salva os clientes em um arquivo .txt
+    """
     with open(ARQUIVO, "w", encoding="utf-8") as f:
         for c in clientes.values():
             linha = SEPARADOR.join(
@@ -256,12 +307,18 @@ def salvar_clientes(clientes):
 
 
 def proximo_id(clientes):
+    """
+    .
+    """
     if not clientes:
         return "1"
     return str(max(int(c["id"]) for c in clientes.values()) + 1)
 
 
 def carregar_clientes():
+    """
+    Carrega os clientes salvos no arquivo .txt
+    """
     clientes = {}
     try:
         with open(ARQUIVO, "r", encoding="utf-8") as f:

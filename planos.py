@@ -1,5 +1,4 @@
 import arquivospim
-from time import sleep
 
 
 def mostrar_planos():
@@ -14,20 +13,20 @@ def mostrar_planos():
     print("[1] - Bronze")
     print("Valor: R$9,90")
     print("Pré-venda nos ingressos")
-    input("\nPressione Enter para continuar...\n")
+    input("\nPressione ENTER para continuar...\n")
 
     print("[2] - Prata")
     print("Valor: R$19,90")
     print("Desconto em ingresso: 20%")
     print("Pré-venda nos ingressos")
-    input("\nPressione Enter para continuar...\n")
+    input("\nPressione ENTER para continuar...\n")
 
     print("[3] - Ouro")
     print("Valor: R$79,90")
     print("Desconto em ingresso: 30%")
     print("Pré-venda nos ingressos")
     print("Descontos em itens oficiais: 20%")
-    input("\nPressione Enter para continuar...\n")
+    input("\nPressione ENTER para continuar...\n")
 
     print("[4] - Diamante")
     print("Valor: R$99,90")
@@ -35,7 +34,13 @@ def mostrar_planos():
     print("Pré-venda nos ingressos")
     print("Descontos em itens oficiais: 40%")
     print("Participação em sorteios do clube")
-    input("\nPressione Enter para continuar...\n")
+    input("\nPressione ENTER para continuar...\n")
+
+    print("[5] - Social(PCD)")
+    print("Valor: R$9,99")
+    print("Desconto em ingresso: 50%")
+    print("Pré-venda nos ingressos")
+    input("\nPressione ENTER para continuar...\n")
 
 
 def mostrar_ingressos():

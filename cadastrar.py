@@ -1,9 +1,9 @@
 """Módulo responsável pelo cadastro de sócios."""
 
 import menu_inicial
-import arquivospim
 import planos
 import formas_pagamentos
+import limpar_tela
 from time import sleep
 import pwinput
 
@@ -27,33 +27,7 @@ def obter_senha():
             return senha
         print("As senhas não são iguais! Tente novamente.")
 
-
-def recuperar_senha():
-    """
-    Recupera a senha usando ID + Nome + Sobrenome.
-    """
-    print("---------- Recuperar Senha ----------")
-    id_ = input("Digite seu ID de sócio: ").strip()
-    nome = input("Digite seu nome: ").capitalize().strip()
-    sobrenome = input("Digite seu sobrenome: ").capitalize().strip()
-
-    clientes = carregar_clientes()
-
-    if id_ not in clientes:
-        print("ID não encontrado!")
-        return
-
-    cliente = clientes[id_]
-    if cliente["nome"] == nome and cliente["sobrenome"] == sobrenome:
-        print(f"\nSua senha é: {cliente['senha']}")
-    else:
-        print("Dados incorretos! Não foi possível recuperar a senha.")
-
-    input("\nPressione ENTER para continuar...")
-    arquivospim.limpar_tela()
-
-
-# --- Confirmações de informações
+# -------------- Confirmações de informações ----------------
 
 
 def confirmar_informacoes(nome: str, sobrenome: str) -> bool:
@@ -103,7 +77,7 @@ def escolher_continuar():
             continue
 
         elif escolha == "0":
-            arquivospim.limpar_tela()
+            limpar_tela.limpar_tela()
             menu_inicial.main()
 
         else:
@@ -113,11 +87,8 @@ def escolher_continuar():
 # --------- Realizar cadastro -----------
 def cadastrar():
     """
-    105 se nao for vazio inicia outro loop
-    confirmar informacoes retorna true ou false
-    while not confirmar_informacoes: se for false ele entra no loop e chama a função alterar_informacoes para corrigir os dados,
-    caso seja true ele quebra o loop e segue o fluxo normal do cadastro
-    é um WHILE TRUE invertido
+    Função encarregada de realizar o cadastro dos usuários recebendo nome, sobrenome
+    idade, escolha do plano e forma de pagamento do mesmo.
     """
     while True:
         escolher_continuar()
@@ -139,7 +110,7 @@ def cadastrar():
                 nome, sobrenome = alterar_informacoes()
             break
 
-    idade = arquivospim.obter_idade()
+    idade = obter_idade()
     if idade < 18 or idade > 120:
         print("Assinaturas indisponiveis para sua idade!")
         sleep(3)
@@ -150,6 +121,12 @@ def cadastrar():
 
     planos.mostrar_planos()
     plano_opcao = input("Escolha o nº do plano: ").upper().strip()
+
+    while plano_opcao not in "12345" or plano_opcao == "":
+        print("Escolha incorreta")
+        print("")
+        print("-" * 40)
+        plano_opcao = input("Escolha o nº do plano: ").upper().strip()
 
     planos_disponiveis = {
         "1": "Bronze",
@@ -177,12 +154,25 @@ def cadastrar():
         print(f"Parabéns {nome} {sobrenome} por adquirir o plano {plano}!!!")
         print(f"=====> Seu ID de sócio é : {novo_id} <=====")
         input("\nPressione ENTER para continuar...")
-        arquivospim.limpar_tela()
-    else:
-        print("Escolha incorreta!")
+        limpar_tela.limpar_tela()
 
 
 # --------- Funções auxiliares ----------
+
+def obter_idade():
+    """
+    -> Função responsável por receber a idade como uma str, transforma-la em int
+    e retorna-lá para que possa ser usada em novo_cadastro()
+    """
+    while True:
+        idade = input("Idade: ")
+
+        try:
+            idade = int(idade)
+            return idade
+        except ValueError:
+            print("Digite um número válido para idade!")
+
 def obter_id():
     """
     Obtem e retorna o ID do usuário para que possa ser usada na função
@@ -209,6 +199,13 @@ def obter_plano() -> str:
             "Opção inválida! Escolha entre 1(Bronze), 2(Prata), 3(Ouro), 4(Diamante) ou 5(Social)."
         )
 
+def proximo_id(clientes):
+    """
+    .
+    """
+    if not clientes:
+        return "1"
+    return str(max(int(c["id"]) for c in clientes.values()) + 1)
 
 # ------- Funções de cadastro ----------
 def acessar_cadastro():
@@ -294,6 +291,8 @@ def acessar_cadastro():
                 print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
 
 
+# ------------- Manipulação de txt ---------------
+
 def salvar_clientes(clientes):
     """
     Salva os clientes em um arquivo .txt
@@ -304,15 +303,6 @@ def salvar_clientes(clientes):
                 [c["id"], c["nome"], c["sobrenome"], c["idade"], c["senha"], c["plano"]]
             )
             f.write(linha + "\n")
-
-
-def proximo_id(clientes):
-    """
-    .
-    """
-    if not clientes:
-        return "1"
-    return str(max(int(c["id"]) for c in clientes.values()) + 1)
 
 
 def carregar_clientes():

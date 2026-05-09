@@ -1,4 +1,6 @@
-import arquivospim
+"""Módulo responsável por apresentar planos e ingressos"""
+
+import limpar_tela
 
 
 def mostrar_planos():
@@ -42,7 +44,6 @@ def mostrar_planos():
     print("Pré-venda nos ingressos")
     input("\nPressione ENTER para continuar...\n")
 
-
 def mostrar_ingressos():
     """
     => Função responsável para mostrar as opções de ingressos que podem ser
@@ -74,6 +75,10 @@ def mostrar_ingressos():
 
 
 def definir_ingresso():
+    """
+    Possbilita a escolha do ingresso por parte do usuario após a apresentação
+    dos mesmo na tela
+    """
     while True:
         try:
             op_ingresso = int(input("Opção: "))
@@ -83,7 +88,7 @@ def definir_ingresso():
                 continue
 
             elif op_ingresso == 0:
-                arquivospim.limpar_tela()
+                limpar_tela.limpar_tela()
                 return
 
             return op_ingresso
@@ -93,6 +98,10 @@ def definir_ingresso():
 
 
 def calcular_valor_final(escolha):
+    """
+    Mostra o valor original do ingresso e o valor com desconto com base no
+    plano do usuário
+    """
     ingressos = [
         ("[1] - NORTE", 80.00),
         ("[2] - SUL", 130.00),

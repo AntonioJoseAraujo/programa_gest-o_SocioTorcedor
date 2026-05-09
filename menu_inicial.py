@@ -1,4 +1,7 @@
-import arquivospim
+"""Módulo responsável por rodar o menu principal e a função main()"""
+
+import limpar_tela
+import controlar_cadastro
 import cadastrar
 import planos
 from time import sleep
@@ -24,37 +27,33 @@ def main():
     """
     -> Função principal responsavel por rodar as demais funções do código a
     partir do primeiro input recebido após a apresentação do menu principal.
-    Variavel opcao: recebe o primeiro input do programa o qual deve ser um número
-
-    if opcao == "1": caso o valor do input seja "1" os planos são apresentados na
-    tela do usuario a partir da função mostrar_planos()
-
-    elif opcao == "2": caso o valor do input seja "2" uma tela de cadastro é
-    apresentada. Esta tela pede o nome a partir de um input direto na função
-    e a idade a partir da função obter_idade definida na váriavel idade
-        Dentro desta estrutura condicional temos:
-        if idade <18: ela impossibilita o cadastro do futuro sócio torcedor caso
-        o mesmo tenha menos de 18 anos
     """
 
     while True:
+        limpar_tela.limpar_tela()
         menu()
         opcao = input("Opção: ")
 
         if opcao == "1":
+            limpar_tela.limpar_tela()
             planos.mostrar_planos()
+            limpar_tela.limpar_tela()
 
         elif opcao == "2":
+            limpar_tela.limpar_tela()
             cadastrar.cadastrar()
 
         elif opcao == "3":
+            limpar_tela.limpar_tela()
             cadastrar.acessar_cadastro()
 
         elif opcao == "4":
-            arquivospim.recuperar_id()
+            limpar_tela.limpar_tela()
+            controlar_cadastro.recuperar_id()
 
         elif opcao == "5":
-            cadastrar.recuperar_senha()
+            limpar_tela.limpar_tela()
+            controlar_cadastro.recuperar_senha()
 
         elif opcao == "0":
             print("Encerrando Sistema...")
@@ -69,5 +68,5 @@ def main():
         ):
             print("Opção incorreta!")
             sleep(2)
-            arquivospim.limpar_tela()
+            limpar_tela.limpar_tela()
             continue

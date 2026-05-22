@@ -5,6 +5,7 @@ import planos
 import formas_pagamentos
 import limpar_tela
 from time import sleep
+from cores import BOLD, BRANCO, RESET, VERMELHO
 import pwinput
 
 ARQUIVO = "socio_torcedor.txt"
@@ -18,14 +19,14 @@ def obter_senha():
     Solicita e confirma a senha do usuário durante o cadastro
     """
     while True:
-        senha = input("Crie uma senha: ").strip()
+        senha = input(BRANCO + BOLD + "Crie uma senha: " + RESET).strip()
         if len(senha) < 4:
-            print("Senha muito curta! Mínimo 4 caracteres.")
+            print(BRANCO + BOLD + "Senha muito curta! Mínimo 4 caracteres." + RESET)
             continue
-        confirma_senha = input("Confirme a senha: ").strip()
+        confirma_senha = input(BRANCO + BOLD + "Confirme a senha: " + RESET).strip()
         if senha == confirma_senha:
             return senha
-        print("As senhas não são iguais! Tente novamente.")
+        print(BRANCO + BOLD + "As senhas não são iguais! Tente novamente." + RESET)
 
 # -------------- Confirmações de informações ----------------
 
@@ -34,20 +35,20 @@ def confirmar_informacoes(nome: str, sobrenome: str) -> bool:
     """
     Confirma nome e o sobrenome digitado
     """
-    print("---------- Confirmação de Informações ----------")
-    print("\nConfirme suas informações:")
-    print(f"Nome: {nome} {sobrenome}")
+    print(VERMELHO + BOLD + "---------- Confirmação de Informações ----------" + RESET)
+    print(BRANCO + BOLD + "\nConfirme suas informações:" + RESET)
+    print(BRANCO + BOLD + f"Nome: {nome} {sobrenome}" + RESET)
     print()
 
     while True:
-        confirmacao = input("As informações estão corretas? (S/N): ").upper().strip()
+        confirmacao = input(BRANCO + BOLD + "As informações estão corretas? (S/N): " + RESET).upper().strip()
         if confirmacao == "S":
             return True
         elif confirmacao == "N":
-            print("Vamos corrigir as informações.")
+            print(BRANCO + BOLD + "Vamos corrigir as informações." + RESET)
             return False  # Quebra o fluxo
         else:
-            print("Opção inválida! Digite 'S' para Sim ou 'N' para Não.")
+            print(BRANCO + BOLD + "Opção inválida! Digite 'S' para Sim ou 'N' para Não." + RESET)
 
 
 def alterar_informacoes() -> str:
@@ -55,25 +56,39 @@ def alterar_informacoes() -> str:
     Permite o usuário digitar novamente o nome e sobrenome caso tenha digitado
     algo incorretamente
     """
-    print("---------- Alterar Informações ----------")
-    nome = input("Digite o nome: ").capitalize().strip()
-    sobrenome = input("Digite o sobrenome: ").capitalize().strip()
-    return nome, sobrenome
+    print(VERMELHO + BOLD + "-------------- Alterar informações -------------" + RESET)
+
+    while True:
+        nome = input(BRANCO + BOLD + "Digite o nome: " + RESET).capitalize().strip()
+        sobrenome = input(BRANCO + BOLD + "Digite o sobrenome: " + RESET).capitalize().strip()
+
+        if nome == "" or sobrenome == "":
+            print(BRANCO + BOLD + "-" * 48 + RESET)
+            print(VERMELHO + BOLD + "O NOME e/ou SOBRENOME não podem estar em branco!" + RESET)
+            continue
+
+        elif not nome.isalpha() or not sobrenome.isalpha():
+            print(BRANCO + BOLD + "-" * 48 + RESET)
+            print(VERMELHO + BOLD + "O NOME e/ou SOBRENOME não podem conter números!" + RESET)
+            continue
+        
+        else:
+            return nome, sobrenome
 
 
 def escolher_continuar():
     """
-    Dá a possbilidade ao usuário de voltar ao menu principal caso tenha apertado
+    Dá a possibilidade ao usuário de voltar ao menu principal caso tenha apertado
     a tecla 2 por engano ou continuar o cadastro caso esse seja seu objetivo
     """
     while True:
-        print("---------- Novo Cadastro ----------")
-        print("[1] - CONTINUAR")
-        print("[0] - MENU PRINCIPAL")
-        escolha = input("Opcão: ")
+        print(BRANCO + BOLD + "[1] - CONTINUAR" + RESET)
+        print(BRANCO + BOLD + "[0] - MENU PRINCIPAL" + RESET)
+        escolha = input(BRANCO + BOLD + "Opção: " + RESET).strip()
 
         if escolha != "1" and escolha != "0":
-            print("Opção inválida!")
+            print(VERMELHO + BOLD + "Opção inválida!" + RESET)
+            print(VERMELHO + BOLD + "-" * 48 + RESET)
             continue
 
         elif escolha == "0":
@@ -91,18 +106,19 @@ def cadastrar():
     idade, escolha do plano e forma de pagamento do mesmo.
     """
     while True:
-        escolher_continuar()
-        nome = input("Nome: ").title().strip()
-        sobrenome = input("Sobrenome: ").title().strip()
+        nome = input(BRANCO + BOLD + "Nome: " + RESET).title().strip()
+        sobrenome = input(BRANCO + BOLD + "Sobrenome: " + RESET).title().strip()
 
         if nome == "" or sobrenome == "":
-            print("O NOME e/ou SOBRENOME não podem estar em branco!")
+            print(BRANCO + BOLD + "-" * 48 + RESET)
+            print(VERMELHO + BOLD + "O NOME e/ou SOBRENOME não podem estar em branco!" + RESET)
             continue
         if (
             not nome.replace(" ", "").isalpha()
             or not sobrenome.replace(" ", "").isalpha()
         ):
-            print("Nome e sobrenome não podem conter números!")
+            print(BRANCO + BOLD + "-" * 48 + RESET)
+            print(VERMELHO + BOLD + "O NOME e/ou SOBRENOME não podem conter números!" + RESET)
             continue
 
         else:
@@ -112,7 +128,7 @@ def cadastrar():
 
     idade = obter_idade()
     if idade < 18 or idade > 120:
-        print("Assinaturas indisponiveis para sua idade!")
+        print(VERMELHO + BOLD + "Assinaturas indisponiveis para sua idade!" + RESET)
         sleep(3)
         menu_inicial.main()
         return
@@ -120,13 +136,13 @@ def cadastrar():
     senha = obter_senha()
 
     planos.mostrar_planos()
-    plano_opcao = input("Escolha o nº do plano: ").upper().strip()
+    plano_opcao = input(BRANCO + BOLD + "Escolha o nº do plano: " + RESET).upper().strip()
 
     while plano_opcao not in "12345" or plano_opcao == "":
-        print("Escolha incorreta")
+        print(VERMELHO + BOLD + "Escolha incorreta" + RESET)
         print("")
         print("-" * 40)
-        plano_opcao = input("Escolha o nº do plano: ").upper().strip()
+        plano_opcao = input(BRANCO + BOLD + "Escolha o nº do plano: " + RESET).upper().strip()
 
     planos_disponiveis = {
         "1": "Bronze",
@@ -151,9 +167,9 @@ def cadastrar():
         }
         salvar_clientes(clientes)
 
-        print(f"Parabéns {nome} {sobrenome} por adquirir o plano {plano}!!!")
-        print(f"=====> Seu ID de sócio é : {novo_id} <=====")
-        input("\nPressione ENTER para continuar...")
+        print(BRANCO + BOLD + f"Parabéns {nome} {sobrenome} por adquirir o plano {plano}!!!" + RESET)
+        print(VERMELHO + BOLD + "=====> " + RESET + BRANCO + BOLD + f"Seu ID de sócio é : {novo_id}" + RESET + VERMELHO + BOLD + " <=====" + RESET)
+        input(BRANCO + "\nPressione ENTER para continuar..." + RESET)
         limpar_tela.limpar_tela()
 
 
@@ -165,13 +181,13 @@ def obter_idade():
     e retorna-lá para que possa ser usada em novo_cadastro()
     """
     while True:
-        idade = input("Idade: ")
+        idade = input(BRANCO + BOLD + "Idade: " + RESET).strip()
 
         try:
             idade = int(idade)
             return idade
         except ValueError:
-            print("Digite um número válido para idade!")
+            print(VERMELHO + BOLD + "Digite um número válido para idade!" + RESET)
 
 def obter_id():
     """
@@ -179,10 +195,10 @@ def obter_id():
     novo_cadastro()
     """
     while True:
-        id_ = input("Digite seu ID de sócio: ").strip()
+        id_ = input(BRANCO + BOLD + "Digite seu ID de sócio: " + RESET).strip()
         if id_:
             return id_
-        print("ID inválido! Por favor, digite o ID correto.")
+        print(VERMELHO + BOLD + "ID inválido! Por favor, digite o ID correto." + RESET)
 
 
 def obter_plano() -> str:
@@ -192,16 +208,17 @@ def obter_plano() -> str:
     """
     opc = {"1": "Bronze", "2": "Prata", "3": "Ouro", "4": "Diamante", "5": "Social"}
     while True:
-        plano = input("Escolha o nº do plano (1-5): ").strip()
+        plano = input(BRANCO + BOLD + "Escolha o nº do plano (1-5): " + RESET).strip()
         if plano in opc:
             return opc[plano]
-        print(
-            "Opção inválida! Escolha entre 1(Bronze), 2(Prata), 3(Ouro), 4(Diamante) ou 5(Social)."
-        )
+
+        print(BRANCO + BOLD + "-" * 40 + RESET)
+        print(VERMELHO + BOLD + "Opção inválida!" + RESET)
+        print(BRANCO + BOLD + "Escolha entre:\n[1] - BRONZE\n[2] - PRATA\n[3] - OURO\n[4] - DIAMANTE\n[5] - SOCIAL" + RESET)
 
 def proximo_id(clientes):
     """
-    .
+    Retorna o próximo ID disponível para um novo cliente.
     """
     if not clientes:
         return "1"
@@ -216,47 +233,61 @@ def acessar_cadastro():
     clientes = carregar_clientes()
 
     print()
-    buscar_id = input("Digite o ID do sócio: ").strip()
+    buscar_id = input(BRANCO + BOLD + "Digite o ID do sócio: " + RESET).strip()
 
     if buscar_id not in clientes:
-        print("Nenhum cadastro encontrado com esse ID.")
+        print(BRANCO + BOLD + "Nenhum cadastro encontrado com esse ID." + RESET)
+        input("Pressione ENTER para continuar...")
+        limpar_tela.limpar_tela()
         return
 
-    senha_digitada = pwinput.pwinput("Digite sua senha: ").strip()
+    senha_digitada = pwinput.pwinput(BRANCO + BOLD + "Digite sua senha: " + RESET).strip()
     if senha_digitada != clientes[buscar_id]["senha"]:
-        print("Senha incorreta!")
-        input("\nEsqueceu sua senha? Use a opção 'Recuperar Senha' no menu.")
+        print(BRANCO + BOLD + "Senha incorreta!" + RESET)
+        input(BRANCO + BOLD + "\nEsqueceu sua senha? Use a opção 'Recuperar Senha' no menu." + RESET)
         return
 
     consulta = clientes[buscar_id]
-    print("_" * 40)
-    print("DADOS DO SÓCIO".center(40))
-    print("_" * 40)
-    print(f"Nº de sócio : {consulta['id']}")
-    print(f"Nome        : {consulta['nome']}")
-    print(f"Sobrenome   : {consulta['sobrenome']}")
-    print(f"Idade       : {consulta['idade']} anos")
-    print(f"Senha       : {consulta['senha']}")
-    print(f"Plano       : {consulta['plano']}")
-    print("_" * 40)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
+    print(VERMELHO + BOLD + "DADOS DO SÓCIO".center(48) + RESET)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
+    print(BRANCO + BOLD + f"Nº de sócio : {consulta['id']}" + RESET)
+    print(BRANCO + BOLD + f"Nome        : {consulta['nome']}" + RESET)
+    print(BRANCO + BOLD + f"Sobrenome   : {consulta['sobrenome']}" + RESET)
+    print(BRANCO + BOLD + f"Idade       : {consulta['idade']} anos" + RESET)
+    print(BRANCO + BOLD + f"Senha       : {consulta['senha']}" + RESET)
+    print(BRANCO + BOLD + f"Plano       : {consulta['plano']}" + RESET)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
 
-    print("[1] - Alterar plano")
-    print("[2] - Cancelar cadastro")
-    print("[3] - Simular venda")
-    print("[0] - Voltar")
-    acao = input("Opção: ").strip()
+    print(BRANCO + BOLD + "[1] - Alterar plano" + RESET)
+    print(BRANCO + BOLD + "[2] - Cancelar cadastro" + RESET)
+    print(BRANCO + BOLD + "[3] - Simular venda" + RESET)
+    print(BRANCO + BOLD + "[0] - Voltar" + RESET)
+    acao = input(BRANCO + BOLD + "Opção: " + RESET).strip()
 
     if acao == "1":
         planos.mostrar_planos()
         novo_plano = obter_plano()
-        clientes[buscar_id]["plano"] = novo_plano
-        salvar_clientes(clientes)
-        print(f"\nPlano alterado para {novo_plano} com sucesso!")
+
+        if clientes[buscar_id]["plano"] == novo_plano:
+            print(BRANCO + BOLD + "-" * 40 + RESET)
+            print(BRANCO + BOLD + "O plano selecionado é o mesmo do seu atual!" + RESET)
+            print(VERMELHO + BOLD + "<Impossivel alterar>" + RESET)
+            input(BRANCO + BOLD + "Pressione ENTER para continuar..." + RESET)
+            limpar_tela.limpar_tela()
+
+        else:
+            clientes[buscar_id]["plano"] = novo_plano
+            salvar_clientes(clientes)
+            print(BRANCO + BOLD + f"\nPlano alterado para {novo_plano} com sucesso!" + RESET)
+            input(BRANCO + BOLD + "Pressione ENTER para continuar..." + RESET)
+            limpar_tela.limpar_tela()
+            
 
     elif acao == "2":
         confirma = (
             input(
-                f"Tem certeza que deseja cancelar o cadastro de {consulta['nome']}? (s/n): "
+                BRANCO + BOLD + f"Tem certeza que deseja cancelar o cadastro de {consulta['nome']}? (s/n): " + RESET
             )
             .strip()
             .lower()
@@ -264,7 +295,7 @@ def acessar_cadastro():
         if confirma == "s":
             del clientes[buscar_id]
             salvar_clientes(clientes)
-            print("\nCadastro cancelado com sucesso.")
+            print(BRANCO + BOLD + "\nCadastro cancelado com sucesso." + RESET)
 
     elif acao == "3":
         planos.mostrar_ingressos()
@@ -276,19 +307,19 @@ def acessar_cadastro():
         if escolha is not None and escolha > 0:
             valor = planos.calcular_valor_final(escolha=escolha)
             if clientes[buscar_id]["plano"] == "Bronze":
-                print("Seu plano não oferece % de desconto")
+                print(BRANCO + BOLD + "Seu plano não oferece % de desconto" + RESET)
 
             elif clientes[buscar_id]["plano"] == "Prata":
-                print(f"Valor à ser pago: R${valor - (valor - valor * 20/100):.2f}")
+                print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 20/100):.2f}" + RESET)
 
             elif clientes[buscar_id]["plano"] == "Ouro":
-                print(f"Valor à ser pago: R${valor - (valor - valor * 30/100):.2f}")
+                print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 30/100):.2f}" + RESET)
 
             elif clientes[buscar_id]["plano"] == "Diamante":
-                print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
+                print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}" + RESET)
 
             elif clientes[buscar_id]["plano"] == "Social":
-                print(f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}")
+                print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}" + RESET)
 
 
 # ------------- Manipulação de txt ---------------

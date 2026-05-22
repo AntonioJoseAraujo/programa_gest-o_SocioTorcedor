@@ -3,6 +3,7 @@
 3 | Ju | Loka | 21 | 0101 | Diamante
 4 | Vitim | Lolo | 24 | 1234 | Bronze
 5 | Babul | Zulum | 9999999 | 2222 | Prata
-6 | Zaku | Zem | 19 | 1111 | Bronze
+6 | Zaku | Zem | 19 | 1111 | Ouro
 7 | Ton | Ze | 37 | 6666 | Social
 8 | T0N1 | 4Rauj0 | 25 | 0101 | Prata
+9 | Titia | Ziza | 45 | totonho01 | Diamante

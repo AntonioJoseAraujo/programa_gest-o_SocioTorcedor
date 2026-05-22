@@ -2,6 +2,7 @@
 
 import cadastrar
 import limpar_tela
+from cores import BOLD, BRANCO, RESET, VERMELHO
 
 def recuperar_id():
     """
@@ -11,39 +12,39 @@ def recuperar_id():
     """
     clientes = cadastrar.carregar_clientes()
     print()
-    print("---------- Recuperar ID de sócio ----------")
-    buscar_nome = input("Digite seu nome: ").strip().capitalize()
-    buscar_sobrenome = input("Digite seu sobrenome: ").strip().capitalize()
+    print(VERMELHO + BOLD + "---------- Recuperar ID de sócio ----------" + RESET)
+    buscar_nome = input(BRANCO + BOLD + "Digite seu nome: " + RESET).strip().capitalize()
+    buscar_sobrenome = input(BRANCO + BOLD + "Digite seu sobrenome: " + RESET).strip().capitalize()
     print()
 
     for cliente in clientes.values():
         if cliente["nome"] == buscar_nome and cliente["sobrenome"] == buscar_sobrenome:
             cliente_encontrado = cliente
-            print(f"Seu ID de sócio é: #{cliente_encontrado['id']}")
+            print(BRANCO + BOLD + f"Seu ID de sócio é: #{cliente_encontrado['id']}" + RESET)
             break
     else:
-        print("Cadastro não encontrado!")
+        print(VERMELHO + BOLD + "Cadastro não encontrado!" + RESET)
 
 def recuperar_senha():
     """
     Recupera a senha usando ID + Nome + Sobrenome.
     """
-    print("---------- Recuperar Senha ----------")
-    id_ = input("Digite seu ID de sócio: ").strip()
-    nome = input("Digite seu nome: ").capitalize().strip()
-    sobrenome = input("Digite seu sobrenome: ").capitalize().strip()
+    print(VERMELHO + BOLD + "---------- Recuperar Senha ----------" + RESET)
+    id_ = input(BRANCO + BOLD + "Digite seu ID de sócio: " + RESET).strip()
+    nome = input(BRANCO + BOLD + "Digite seu nome: " + RESET).capitalize().strip()
+    sobrenome = input(BRANCO + BOLD + "Digite seu sobrenome: " + RESET).capitalize().strip()
 
     clientes = cadastrar.carregar_clientes()
 
     if id_ not in clientes:
-        print("ID não encontrado!")
+        print(VERMELHO + BOLD + "ID não encontrado!" + RESET)
         return
 
     cliente = clientes[id_]
     if cliente["nome"] == nome and cliente["sobrenome"] == sobrenome:
-        print(f"\nSua senha é: {cliente['senha']}")
+        print(BRANCO + BOLD + f"\nSua senha é: {cliente['senha']}" + RESET)
     else:
-        print("Dados incorretos! Não foi possível recuperar a senha.")
+        print(BRANCO + BOLD + "Dados incorretos! Não foi possível recuperar a senha." + RESET)
 
-    input("\nPressione ENTER para continuar...")
+    input(BRANCO + BOLD + "\nPressione ENTER para continuar..." + RESET)
     limpar_tela.limpar_tela()

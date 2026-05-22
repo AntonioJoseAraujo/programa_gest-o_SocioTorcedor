@@ -1,48 +1,46 @@
 """Módulo responsável por apresentar planos e ingressos"""
 
 import limpar_tela
-
+from cores import BOLD, BRANCO, RESET, VERMELHO
 
 def mostrar_planos():
     """
     -> Função responsável por mostrar planos e seus benificios ao usuário
     """
 
-    print("_" * 40)
-    print("PLANOS DISPONÍVEIS".center(40))
-    print("_" * 40)
+    print(VERMELHO + BOLD + '-------------- Planos disponiveis --------------'+ RESET)
 
-    print("[1] - Bronze")
-    print("Valor: R$9,90")
-    print("Pré-venda nos ingressos")
-    input("\nPressione ENTER para continuar...\n")
+    print(VERMELHO + BOLD + "[1] - Bronze" + RESET)
+    print(BRANCO + BOLD + "Valor: R$9,90" + RESET)
+    print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
+    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
 
-    print("[2] - Prata")
-    print("Valor: R$19,90")
-    print("Desconto em ingresso: 20%")
-    print("Pré-venda nos ingressos")
-    input("\nPressione ENTER para continuar...\n")
+    print(VERMELHO + BOLD + "[2] - Prata" + RESET)
+    print(BRANCO + BOLD + "Valor: R$19,90" + RESET)
+    print(BRANCO + BOLD + "Desconto em ingresso: 20%" + RESET)
+    print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
+    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
 
-    print("[3] - Ouro")
-    print("Valor: R$79,90")
-    print("Desconto em ingresso: 30%")
-    print("Pré-venda nos ingressos")
-    print("Descontos em itens oficiais: 20%")
-    input("\nPressione ENTER para continuar...\n")
+    print(VERMELHO + BOLD + "[3] - Ouro" + RESET)
+    print(BRANCO + BOLD + "Valor: R$79,90" + RESET)
+    print(BRANCO + BOLD + "Desconto em ingresso: 30%" + RESET)
+    print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
+    print(BRANCO + BOLD + "Descontos em itens oficiais: 20%" + RESET)
+    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
 
-    print("[4] - Diamante")
-    print("Valor: R$99,90")
-    print("Desconto em ingresso: 50%")
-    print("Pré-venda nos ingressos")
-    print("Descontos em itens oficiais: 40%")
-    print("Participação em sorteios do clube")
-    input("\nPressione ENTER para continuar...\n")
+    print(VERMELHO + BOLD + "[4] - Diamante" + RESET)
+    print(BRANCO + BOLD + "Valor: R$99,90" + RESET)
+    print(BRANCO + BOLD + "Desconto em ingresso: 50%" + RESET)
+    print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
+    print(BRANCO + BOLD + "Descontos em itens oficiais: 40%" + RESET)
+    print(BRANCO + BOLD + "Participação em sorteios do clube" + RESET)
+    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
 
-    print("[5] - Social(PCD)")
-    print("Valor: R$9,99")
-    print("Desconto em ingresso: 50%")
-    print("Pré-venda nos ingressos")
-    input("\nPressione ENTER para continuar...\n")
+    print(VERMELHO + BOLD + "[5] - Social(PCD)" + RESET)
+    print(BRANCO + BOLD + "Valor: R$9,99" + RESET)
+    print(BRANCO + BOLD + "Desconto em ingresso: 50%" + RESET)
+    print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
+    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
 
 def mostrar_ingressos():
     """
@@ -64,14 +62,14 @@ def mostrar_ingressos():
         ("[11] - OESTE INFERIOR LATERAL", 290.00),
     ]
 
-    print("_" * 40)
-    print("INGRESSOS DISPONIVEIS".center(40))
-    print("_" * 40)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
+    print(VERMELHO + BOLD + "INGRESSOS DISPONIVEIS".center(48) + RESET)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
 
     for ingresso, valor in ingressos:
         valor = f"{valor:.2f}"
-        print(f"{ingresso:.<32}R${valor:>0}")
-    print("[0] - MENU PRINCIPAL")
+        print(BRANCO + BOLD + f"{ingresso:.<32}R${valor:>0}" + RESET)
+    print(VERMELHO + BOLD + "[0] - MENU PRINCIPAL" + RESET)
 
 
 def definir_ingresso():
@@ -84,7 +82,8 @@ def definir_ingresso():
             op_ingresso = int(input("Opção: "))
 
             if op_ingresso < 0 or op_ingresso > 11:
-                print("Escolha uma opção válida!")
+                print(BRANCO + BOLD + "-" * 48 + RESET)
+                print(VERMELHO + BOLD + "Escolha uma opção válida!" + RESET)
                 continue
 
             elif op_ingresso == 0:
@@ -94,7 +93,8 @@ def definir_ingresso():
             return op_ingresso
 
         except ValueError:
-            print("Digite o número correspondente ao ingresso!")
+            print(BRANCO + BOLD + "-" * 48 + RESET)
+            print(VERMELHO + BOLD + "Digite o número correspondente ao ingresso!" + RESET)
 
 
 def calcular_valor_final(escolha):

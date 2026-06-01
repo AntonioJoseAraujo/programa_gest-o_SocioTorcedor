@@ -4,8 +4,9 @@ import menu_inicial
 import planos
 import formas_pagamentos
 import limpar_tela
-from cores import BOLD, BRANCO, RESET, VERMELHO
+from cores import BOLD, BRANCO, RESET, VERMELHO, VERDE, AMARELO
 import pwinput
+from datetime import date, timedelta
 
 ARQUIVO = "socio_torcedor.txt"
 SEPARADOR = " | "
@@ -203,6 +204,7 @@ def cadastrar():
             "idade": str(idade),
             "senha": senha,
             "plano": plano,
+            "data_pagamento": str(date.today()),
         }
         salvar_clientes(clientes)
 
@@ -292,6 +294,62 @@ def proximo_id(clientes):
     return str(max(int(c["id"]) for c in clientes.values()) + 1)
 
 
+# ------- Verificação de pagamento -------
+
+
+def verificar_pagamento(cliente: dict, clientes: dict) -> bool:
+    """
+    Verifica se a mensalidade do sócio está em dia.
+    - Retorna True se o acesso pode continuar.
+    - Retorna False se o sócio optou por não renovar.
+    A mensalidade vence 30 dias após a data do último pagamento.
+    """
+    data_pagamento = date.fromisoformat(cliente["data_pagamento"])
+    data_vencimento = data_pagamento + timedelta(days=30)
+    hoje = date.today()
+    dias_em_atraso = (hoje - data_vencimento).days
+
+    if hoje <= data_vencimento:
+        dias_restantes = (data_vencimento - hoje).days
+        vencimento_fmt = data_vencimento.strftime("%d/%m/%Y")
+        print(VERDE + BOLD + f"Mensalidade em dia! Vence em {dias_restantes} dia(s) ({vencimento_fmt})." + RESET)
+        return True
+
+    # Mensalidade vencida
+    vencimento_fmt = data_vencimento.strftime("%d/%m/%Y")
+    hoje_fmt = hoje.strftime("%d/%m/%Y")
+    print(VERMELHO + BOLD + "================================================" + RESET)
+    print(VERMELHO + BOLD + "       ⚠  MENSALIDADE VENCIDA  ⚠              " + RESET)
+    print(VERMELHO + BOLD + "================================================" + RESET)
+    print(BRANCO + BOLD + f"Vencimento : {vencimento_fmt}" + RESET)
+    print(BRANCO + BOLD + f"Hoje       : {hoje_fmt}" + RESET)
+    print(AMARELO + BOLD + f"Em atraso  : {dias_em_atraso} dia(s)" + RESET)
+    print(VERMELHO + BOLD + "------------------------------------------------" + RESET)
+
+    while True:
+        renovar = (
+            input(BRANCO + BOLD + "Deseja renovar sua mensalidade agora? (S/N): " + RESET)
+            .strip()
+            .upper()
+        )
+        if renovar == "S":
+            formas_pagamentos.pagamentos()
+            cliente["data_pagamento"] = str(date.today())
+            clientes[cliente["id"]] = cliente
+            salvar_clientes(clientes)
+            print(VERDE + BOLD + "\nMensalidade renovada com sucesso!" + RESET)
+            input("Pressione ENTER para continuar...")
+            limpar_tela.limpar_tela()
+            return True
+        elif renovar == "N":
+            print(BRANCO + BOLD + "\nAcesso negado. Renove sua mensalidade para continuar." + RESET)
+            input("Pressione ENTER para continuar...")
+            limpar_tela.limpar_tela()
+            return False
+        else:
+            print(VERMELHO + BOLD + "Opção inválida! Digite 'S' para Sim ou 'N' para Não." + RESET)
+
+
 # ------- Funções de cadastro ----------
 def acessar_cadastro():
     """
@@ -323,6 +381,14 @@ def acessar_cadastro():
         return
 
     consulta = clientes[buscar_id]
+
+    # Verificar se a mensalidade está em dia antes de liberar o acesso
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
+    print(VERMELHO + BOLD + "SITUAÇÃO DA MENSALIDADE".center(48) + RESET)
+    print(VERMELHO + BOLD + "_" * 48 + RESET)
+    if not verificar_pagamento(consulta, clientes):
+        return
+
     print(VERMELHO + BOLD + "_" * 48 + RESET)
     print(VERMELHO + BOLD + "DADOS DO SÓCIO".center(48) + RESET)
     print(VERMELHO + BOLD + "_" * 48 + RESET)
@@ -439,8 +505,9 @@ def salvar_clientes(clientes):
     """
     with open(ARQUIVO, "w", encoding="utf-8") as f:
         for c in clientes.values():
+            data_pagamento = c.get("data_pagamento", str(date.today()))
             linha = SEPARADOR.join(
-                [c["id"], c["nome"], c["sobrenome"], c["idade"], c["senha"], c["plano"]]
+                [c["id"], c["nome"], c["sobrenome"], c["idade"], c["senha"], c["plano"], data_pagamento]
             )
             f.write(linha + "\n")
 
@@ -455,7 +522,13 @@ def carregar_clientes():
             for linha in f:
                 linha = linha.strip()
                 if linha:
-                    id_, nome, sobrenome, idade, senha, plano = linha.split(SEPARADOR)
+                    partes = linha.split(SEPARADOR)
+                    # Retrocompatibilidade: registros antigos sem data_pagamento
+                    if len(partes) == 6:
+                        id_, nome, sobrenome, idade, senha, plano = partes
+                        data_pagamento = str(date.today())
+                    else:
+                        id_, nome, sobrenome, idade, senha, plano, data_pagamento = partes
                     clientes[id_] = {
                         "id": id_,
                         "nome": nome,
@@ -463,6 +536,7 @@ def carregar_clientes():
                         "idade": idade,
                         "senha": senha,
                         "plano": plano,
+                        "data_pagamento": data_pagamento,
                     }
     except FileNotFoundError:
         pass

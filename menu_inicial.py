@@ -7,10 +7,9 @@ import planos
 from time import sleep
 from cores import BOLD, BRANCO, RESET, VERMELHO
 
-
 def cabecalho():
     """
-    -> Função responsável por comportar o print do cabeçalho o qual é chamado
+    -> Função responsável por comportar o print do cabeçalho o qual é chamado 
     em cada tela selecionada no menu principal
     """
     print(VERMELHO + BOLD + "_" * 48 + RESET)
@@ -24,15 +23,7 @@ def menu():
     -> Função responsável por apresentar o menu principal
     """
     cabecalho()
-    print(
-        VERMELHO
-        + BOLD
-        + "[1]"
-        + RESET
-        + BRANCO
-        + " - Mostrar planos disponíveis"
-        + RESET
-    )
+    print(VERMELHO + BOLD + "[1]" + RESET + BRANCO + " - Mostrar planos disponíveis" + RESET)
     print(VERMELHO + BOLD + "[2]" + RESET + BRANCO + " - Novo cadastro" + RESET)
     print(VERMELHO + BOLD + "[3]" + RESET + BRANCO + " - Acessar seu cadastro" + RESET)
     print(VERMELHO + BOLD + "[4]" + RESET + BRANCO + " - Esqueci meu ID" + RESET)
@@ -45,6 +36,7 @@ def main():
     -> Função principal responsável por rodar as demais funções do código a
     partir do primeiro input recebido após a apresentação do menu principal.
     """
+    limpar_tela.limpar_tela()
 
     while True:
         menu()
@@ -59,48 +51,28 @@ def main():
         elif opcao == "2":
             limpar_tela.limpar_tela()
             cabecalho()
-            print(
-                VERMELHO
-                + BOLD
-                + "---------------- Novo cadastro -----------------"
-                + RESET
-            )
+            print(VERMELHO + BOLD + "---------------- Novo cadastro -----------------" + RESET)
             cadastrar.escolher_continuar()
             cadastrar.cadastrar()
 
         elif opcao == "3":
             limpar_tela.limpar_tela()
             cabecalho()
-            print(
-                VERMELHO
-                + BOLD
-                + "--------------- Acessar cadastro ---------------"
-                + RESET
-            )
+            print(VERMELHO + BOLD + '--------------- Acessar cadastro ---------------' + RESET)
             cadastrar.escolher_continuar()
             cadastrar.acessar_cadastro()
 
         elif opcao == "4":
             limpar_tela.limpar_tela()
             cabecalho()
-            print(
-                VERMELHO
-                + BOLD
-                + "----------------- Recuperar ID -----------------"
-                + RESET
-            )
+            print(VERMELHO + BOLD + '----------------- Recuperar ID -----------------' + RESET)
             cadastrar.escolher_continuar()
             controlar_cadastro.recuperar_id()
 
         elif opcao == "5":
             limpar_tela.limpar_tela()
             cabecalho()
-            print(
-                VERMELHO
-                + BOLD
-                + "---------------- Recuperar senha ---------------"
-                + RESET
-            )
+            print(VERMELHO + BOLD + '---------------- Recuperar senha ---------------' + RESET)
             cadastrar.escolher_continuar()
             controlar_cadastro.recuperar_senha()
 
@@ -110,7 +82,7 @@ def main():
             break
 
         else:
-            print(BRANCO + BOLD + "Opção incorreta!" + RESET)
-            sleep(2)
+            print(VERMELHO + BOLD + "Opção incorreta!" + RESET)
+            sleep(1)
             limpar_tela.limpar_tela()
             continue

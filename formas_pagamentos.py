@@ -4,12 +4,13 @@ import random
 import string
 from time import sleep
 from cores import AZUL, BOLD, BRANCO, RESET, VERDE, VERMELHO
+
 # --- Formas de pagamento -----------------------------------------
 
 
 def pagamentos():
     """
-    Dá ao usuário a opção de escolher a forma de pagamento ao selecionar um 
+    Dá ao usuário a opção de escolher a forma de pagamento ao selecionar um
     plano no ato do cadastro
     """
 
@@ -29,7 +30,6 @@ def pagamentos():
         2 - Cartão
         3 - Boleto
         Selecione uma das opções: """ + RESET)
-
 
     sleep(1)
     if pagamento == "1":
@@ -54,16 +54,30 @@ def pag_cartao():
     Simula o pagamento do plano via cartão de crédito
     """
     while True:
-        num_cartao = input(BRANCO + BOLD + "Digite os dados do seu cartão: " + RESET).strip()
+        num_cartao = input(
+            BRANCO + BOLD + "Digite os dados do seu cartão: " + RESET
+        ).strip()
         if len(num_cartao) == 16 and num_cartao.isdigit():
             break
-        print(BRANCO + BOLD + "\nNúmero do cartão inválido! Digite corretamente os números." + RESET)
+        print(
+            VERMELHO
+            + BOLD
+            + "\nNúmero do cartão inválido! Digite corretamente os números."
+            + RESET
+        )
+        print(VERMELHO + BOLD + "-" * 48 + RESET)
 
     while True:
         cv = input(BRANCO + BOLD + "Cód. Segurança: " + RESET).strip()
         if len(cv) == 3 and cv.isdigit():
             break
-        print(BRANCO + BOLD + "\nCódigo de Segurança inválido! Digite novamente." + RESET)
+        print(
+            VERMELHO
+            + BOLD
+            + "\nCódigo de Segurança inválido! Digite novamente."
+            + RESET
+        )
+        print(VERMELHO + BOLD + "-" * 48 + RESET)
 
     print(BRANCO + BOLD + "\nProcessando o pagamento!" + RESET)
     for i in range(1, 10):

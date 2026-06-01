@@ -13,34 +13,38 @@ def mostrar_planos():
     print(VERMELHO + BOLD + "[1] - Bronze" + RESET)
     print(BRANCO + BOLD + "Valor: R$9,90" + RESET)
     print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
-    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
+    input("Pressione ENTER para continuar...")
 
+    print()
     print(VERMELHO + BOLD + "[2] - Prata" + RESET)
     print(BRANCO + BOLD + "Valor: R$19,90" + RESET)
     print(BRANCO + BOLD + "Desconto em ingresso: 20%" + RESET)
     print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
-    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
+    input("Pressione ENTER para continuar...")
 
+    print()
     print(VERMELHO + BOLD + "[3] - Ouro" + RESET)
     print(BRANCO + BOLD + "Valor: R$79,90" + RESET)
     print(BRANCO + BOLD + "Desconto em ingresso: 30%" + RESET)
     print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
     print(BRANCO + BOLD + "Descontos em itens oficiais: 20%" + RESET)
-    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
+    input("Pressione ENTER para continuar...")
 
+    print()
     print(VERMELHO + BOLD + "[4] - Diamante" + RESET)
     print(BRANCO + BOLD + "Valor: R$99,90" + RESET)
     print(BRANCO + BOLD + "Desconto em ingresso: 50%" + RESET)
     print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
     print(BRANCO + BOLD + "Descontos em itens oficiais: 40%" + RESET)
     print(BRANCO + BOLD + "Participação em sorteios do clube" + RESET)
-    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
+    input("Pressione ENTER para continuar...")
 
+    print()
     print(VERMELHO + BOLD + "[5] - Social(PCD)" + RESET)
     print(BRANCO + BOLD + "Valor: R$9,99" + RESET)
     print(BRANCO + BOLD + "Desconto em ingresso: 50%" + RESET)
     print(BRANCO + BOLD + "Pré-venda nos ingressos" + RESET)
-    input(BOLD + "\nPressione ENTER para continuar...\n" + RESET)
+    input("Pressione ENTER para continuar...")
 
 def mostrar_ingressos():
     """
@@ -120,5 +124,5 @@ def calcular_valor_final(escolha):
         return
     else:
         ingresso = ingressos[escolha - 1][1]
-        print(f"Valor total do ingresso R${ingresso:.2f}")
+        print(BRANCO + BOLD + f"Valor total do ingresso R${ingresso:.2f}" + RESET)
         return ingresso

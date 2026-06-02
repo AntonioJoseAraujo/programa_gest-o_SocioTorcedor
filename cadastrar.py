@@ -294,6 +294,58 @@ def proximo_id(clientes):
     return str(max(int(c["id"]) for c in clientes.values()) + 1)
 
 
+def carregar_clientes():
+    """
+    Carrega os clientes do arquivo de dados e retorna um dicionário.
+    """
+    clientes = {}
+    try:
+        with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
+            for linha in arquivo:
+                linha = linha.strip()
+                if not linha:
+                    continue
+
+                partes = linha.split(SEPARADOR)
+                if len(partes) != 7:
+                    continue
+
+                id_, nome, sobrenome, idade, senha, plano, data_pagamento = partes
+                clientes[id_] = {
+                    "id": id_,
+                    "nome": nome,
+                    "sobrenome": sobrenome,
+                    "idade": idade,
+                    "senha": senha,
+                    "plano": plano,
+                    "data_pagamento": data_pagamento,
+                }
+    except FileNotFoundError:
+        return {}
+
+    return clientes
+
+
+def salvar_clientes(clientes):
+    """
+    Salva os clientes no arquivo de dados.
+    """
+    with open(ARQUIVO, "w", encoding="utf-8") as arquivo:
+        for cliente in clientes.values():
+            linha = SEPARADOR.join(
+                [
+                    cliente["id"],
+                    cliente["nome"],
+                    cliente["sobrenome"],
+                    cliente["idade"],
+                    cliente["senha"],
+                    cliente["plano"],
+                    cliente["data_pagamento"],
+                ]
+            )
+            arquivo.write(linha + "\n")
+
+
 # ------- Verificação de pagamento -------
 
 
@@ -310,16 +362,15 @@ def verificar_pagamento(cliente: dict, clientes: dict) -> bool:
     dias_em_atraso = (hoje - data_vencimento).days
 
     if hoje <= data_vencimento:
-        dias_restantes = (data_vencimento - hoje).days
-        vencimento_fmt = data_vencimento.strftime("%d/%m/%Y")
-        print(VERDE + BOLD + f"Mensalidade em dia! Vence em {dias_restantes} dia(s) ({vencimento_fmt})." + RESET)
+        # Apenas retorna True se estiver em dia (o print bonito vai para os dados do sócio)
         return True
 
     # Mensalidade vencida
     vencimento_fmt = data_vencimento.strftime("%d/%m/%Y")
     hoje_fmt = hoje.strftime("%d/%m/%Y")
+    
     print(VERMELHO + BOLD + "================================================" + RESET)
-    print(VERMELHO + BOLD + "       ⚠  MENSALIDADE VENCIDA  ⚠              " + RESET)
+    print(VERMELHO + BOLD + "           ⚠  MENSALIDADE VENCIDA  ⚠                " + RESET)
     print(VERMELHO + BOLD + "================================================" + RESET)
     print(BRANCO + BOLD + f"Vencimento : {vencimento_fmt}" + RESET)
     print(BRANCO + BOLD + f"Hoje       : {hoje_fmt}" + RESET)
@@ -350,7 +401,6 @@ def verificar_pagamento(cliente: dict, clientes: dict) -> bool:
             print(VERMELHO + BOLD + "Opção inválida! Digite 'S' para Sim ou 'N' para Não." + RESET)
 
 
-# ------- Funções de cadastro ----------
 def acessar_cadastro():
     """
     Permite que o usuario acesse o cadastro para que possa acessar algumas opções
@@ -370,25 +420,31 @@ def acessar_cadastro():
     senha_digitada = pwinput.pwinput(
         BRANCO + BOLD + "Digite sua senha: " + RESET
     ).strip()
+    
     if senha_digitada != clientes[buscar_id]["senha"]:
         print(BRANCO + BOLD + "Senha incorreta!" + RESET)
         input(
-            BRANCO
-            + BOLD
-            + "\nEsqueceu sua senha? Use a opção 'Recuperar Senha' no menu."
-            + RESET
+            BRANCO + BOLD + "\nEsqueceu sua senha? Use a opção 'Recuperar Senha' no menu." + RESET
         )
         return
 
     consulta = clientes[buscar_id]
 
-    # Verificar se a mensalidade está em dia antes de liberar o acesso
-    print(VERMELHO + BOLD + "_" * 48 + RESET)
-    print(VERMELHO + BOLD + "SITUAÇÃO DA MENSALIDADE".center(48) + RESET)
-    print(VERMELHO + BOLD + "_" * 48 + RESET)
-    if not verificar_pagamento(consulta, clientes):
+    # 1. Verifica/Renova o pagamento primeiro
+    pagamento_em_dia = verificar_pagamento(consulta, clientes)
+    
+    if not pagamento_em_dia:
         return
 
+    # Se o cliente acabou de renovar na função acima, recarregamos a data atualizada
+    data_pgto_obj = date.fromisoformat(consulta['data_pagamento'])
+    data_pgto_fmt = data_pgto_obj.strftime("%d/%m/%Y")
+    
+    # Define os detalhes visuais dinamicamente
+    status_financeiro = "EM DIA"
+    cor_status = VERDE
+
+    # 2. Print Unificado com Dados do Sócio e Situação
     print(VERMELHO + BOLD + "_" * 48 + RESET)
     print(VERMELHO + BOLD + "DADOS DO SÓCIO".center(48) + RESET)
     print(VERMELHO + BOLD + "_" * 48 + RESET)
@@ -396,148 +452,91 @@ def acessar_cadastro():
     print(BRANCO + BOLD + f"Nome        : {consulta['nome']}" + RESET)
     print(BRANCO + BOLD + f"Sobrenome   : {consulta['sobrenome']}" + RESET)
     print(BRANCO + BOLD + f"Idade       : {consulta['idade']} anos" + RESET)
-    print(BRANCO + BOLD + f"Senha       : {consulta['senha']}" + RESET)
     print(BRANCO + BOLD + f"Plano       : {consulta['plano']}" + RESET)
+    print(BRANCO + BOLD + f"Último Pag. : {data_pgto_fmt}" + RESET)
+    print(BRANCO + BOLD + f"Situação    : " + cor_status + status_financeiro + RESET)
     print(VERMELHO + BOLD + "_" * 48 + RESET)
 
+    # Menu de opções
     print(BRANCO + BOLD + "[1] - Alterar plano" + RESET)
     print(BRANCO + BOLD + "[2] - Cancelar cadastro" + RESET)
     print(BRANCO + BOLD + "[3] - Simular venda" + RESET)
     print(BRANCO + BOLD + "[0] - Voltar" + RESET)
-    acao = input(BRANCO + BOLD + "Opção: " + RESET).strip()
+    
+    while True:
+        acao = input(BRANCO + BOLD + "Opção: " + RESET).strip()
+        
+        if acao not in "1230" or acao == "":
+            print(VERMELHO + BOLD + "Opção inválida!" + RESET)
+            print(VERMELHO + BOLD + "-" * 48 + RESET)
+            continue  
 
-    if acao == "1":
-        planos.mostrar_planos()
-        novo_plano = obter_plano()
+        if acao == "1":
+            planos.mostrar_planos()
+            novo_plano = obter_plano()
 
-        if clientes[buscar_id]["plano"] == novo_plano:
-            print(VERMELHO + BOLD + "-" * 40 + RESET)
-            print(BRANCO + BOLD + "O plano selecionado é o mesmo do seu atual!" + RESET)
-            print(VERMELHO + BOLD + "<Impossivel alterar>" + RESET)
-            input("Pressione ENTER para continuar...")
-            limpar_tela.limpar_tela()
+            if clientes[buscar_id]["plano"] == novo_plano:
+                print(VERMELHO + BOLD + "-" * 40 + RESET)
+                print(BRANCO + BOLD + "O plano selecionado é o mesmo do seu atual!" + RESET)
+                print(VERMELHO + BOLD + "<Impossivel alterar>" + RESET)
+                input("Pressione ENTER para continuar...")
+                limpar_tela.limpar_tela()
+            else:
+                clientes[buscar_id]["plano"] = novo_plano
+                salvar_clientes(clientes)
+                print(BRANCO + BOLD + f"\nPlano alteredo para {novo_plano} com sucesso!" + RESET)
+                input("Pressione ENTER para continuar...")
+                limpar_tela.limpar_tela()
+            break  
 
-        else:
-            clientes[buscar_id]["plano"] = novo_plano
-            salvar_clientes(clientes)
-            print(
-                BRANCO
-                + BOLD
-                + f"\nPlano alterado para {novo_plano} com sucesso!"
-                + RESET
+        elif acao == "2":
+            confirma = (
+                input(BRANCO + BOLD + f"Tem certeza que deseja cancelar o cadastro de {consulta['nome']}? (s/n): " + RESET)
+                .strip()
+                .lower()
             )
-            input("Pressione ENTER para continuar...")
+            if confirma == "s":
+                del clientes[buscar_id]
+                salvar_clientes(clientes)
+                print(BRANCO + BOLD + "\nCadastro cancelado com sucesso." + RESET)
+                input("Pressione ENTER para continuar...")
+                limpar_tela.limpar_tela()
+            break
+
+        elif acao == "3":
+            planos.mostrar_ingressos()
+            escolha = planos.definir_ingresso()  
+            print()
+
+            if escolha is not None and escolha > 0:
+                valor = planos.calcular_valor_final(escolha=escolha)
+                plano_atual = clientes[buscar_id]["plano"]
+
+                if plano_atual == "Bronze":
+                    print(BRANCO + BOLD + "Seu plano não oferece % de desconto" + RESET)
+                    input("\nPressione ENTER para continuar")
+                    limpar_tela.limpar_tela()
+                    return
+                
+                elif plano_atual == "Prata":
+                    print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 20/100):.2f}" + RESET)
+                    input("\nPressione ENTER para continuar")
+                    limpar_tela.limpar_tela()
+                    return
+                
+                elif plano_atual == "Ouro":
+                    print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 30/100):.2f}" + RESET)
+                    input("\nPressione ENTER para continuar")
+                    limpar_tela.limpar_tela()
+                    return
+                
+                elif plano_atual == "Diamante" or plano_atual == "Social":
+                    print(BRANCO + BOLD + f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}" + RESET)
+                    input("\nPressione ENTER para continuar")
+                    limpar_tela.limpar_tela()
+                    return
+
+        elif acao == "0":
+            input("\nPressione ENTER para continuar")
             limpar_tela.limpar_tela()
-
-    elif acao == "2":
-        confirma = (
-            input(
-                BRANCO
-                + BOLD
-                + f"Tem certeza que deseja cancelar o cadastro de {consulta['nome']}? (s/n): "
-                + RESET
-            )
-            .strip()
-            .lower()
-        )
-        if confirma == "s":
-            del clientes[buscar_id]
-            salvar_clientes(clientes)
-            print(BRANCO + BOLD + "\nCadastro cancelado com sucesso." + RESET)
-            input("Pressione ENTER para continuar...")
-            limpar_tela.limpar_tela()
-
-    elif acao == "3":
-        planos.mostrar_ingressos()
-        escolha = (
-            planos.definir_ingresso()
-        )  # pode ser None caso o usuário escolha voltar para o menu principal
-        print()
-
-        if escolha is not None and escolha > 0:
-            valor = planos.calcular_valor_final(escolha=escolha)
-            if clientes[buscar_id]["plano"] == "Bronze":
-                print(BRANCO + BOLD + "Seu plano não oferece % de desconto" + RESET)
-
-            elif clientes[buscar_id]["plano"] == "Prata":
-                print(
-                    BRANCO
-                    + BOLD
-                    + f"Valor à ser pago: R${valor - (valor - valor * 20/100):.2f}"
-                    + RESET
-                )
-
-            elif clientes[buscar_id]["plano"] == "Ouro":
-                print(
-                    BRANCO
-                    + BOLD
-                    + f"Valor à ser pago: R${valor - (valor - valor * 30/100):.2f}"
-                    + RESET
-                )
-
-            elif clientes[buscar_id]["plano"] == "Diamante":
-                print(
-                    BRANCO
-                    + BOLD
-                    + f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}"
-                    + RESET
-                )
-
-            elif clientes[buscar_id]["plano"] == "Social":
-                print(
-                    BRANCO
-                    + BOLD
-                    + f"Valor à ser pago: R${valor - (valor - valor * 50/100):.2f}"
-                    + RESET
-                )
-    elif acao == "0":
-        input("\nPressione ENTER para continuar")
-        limpar_tela.limpar_tela()
-        return
-
-
-# ------------- Manipulação de txt ---------------
-
-
-def salvar_clientes(clientes):
-    """
-    Salva os clientes em um arquivo .txt
-    """
-    with open(ARQUIVO, "w", encoding="utf-8") as f:
-        for c in clientes.values():
-            data_pagamento = c.get("data_pagamento", str(date.today()))
-            linha = SEPARADOR.join(
-                [c["id"], c["nome"], c["sobrenome"], c["idade"], c["senha"], c["plano"], data_pagamento]
-            )
-            f.write(linha + "\n")
-
-
-def carregar_clientes():
-    """
-    Carrega os clientes salvos no arquivo .txt
-    """
-    clientes = {}
-    try:
-        with open(ARQUIVO, "r", encoding="utf-8") as f:
-            for linha in f:
-                linha = linha.strip()
-                if linha:
-                    partes = linha.split(SEPARADOR)
-                    # Retrocompatibilidade: registros antigos sem data_pagamento
-                    if len(partes) == 6:
-                        id_, nome, sobrenome, idade, senha, plano = partes
-                        data_pagamento = str(date.today())
-                    else:
-                        id_, nome, sobrenome, idade, senha, plano, data_pagamento = partes
-                    clientes[id_] = {
-                        "id": id_,
-                        "nome": nome,
-                        "sobrenome": sobrenome,
-                        "idade": idade,
-                        "senha": senha,
-                        "plano": plano,
-                        "data_pagamento": data_pagamento,
-                    }
-    except FileNotFoundError:
-        pass
-    return clientes
+            return
